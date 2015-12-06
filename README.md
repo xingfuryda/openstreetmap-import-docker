@@ -1,18 +1,21 @@
-# OpenStreetMap Tile Server Container
+# OpenStreetMap Import Container
 
 This repository contains instructions for building a
-[Docker](https://www.docker.io/) image containing the OpenStreetMap tile
-serving software stack.  It is based on the
+[Docker](https://www.docker.io/) image containing software
+for importing OpenStreetMap data into a PostgreSQL database using osm2pgsql.
+It is partly based on the
 [Switch2OSM instructions](http://switch2osm.org/serving-tiles/manually-building-a-tile-server-12-04/).
 
-As well as providing an easy way to set up and run the tile serving software it
+Based also on [geo-data/openstreetmap-tiles-docker](https://github.com/geo-data/openstreetmap-tiles-docker)
+
+As well as providing an easy way to set up and run osm2pgsql it
 also provides instructions for managing the back end database, allowing you to:
 
 * Create the database
 * Import OSM data into the database
 * Drop the database
 
-Run `docker run homme/openstreetmap-tiles` for usage instructions.
+Run `docker run xingfuryda/openstreetmap-import-docker` for usage instructions.
 
 ## About
 
@@ -25,12 +28,10 @@ includes:
 * The latest [Osm2pgsql](http://wiki.openstreetmap.org/wiki/Osm2pgsql) code (at
   the time of image creation)
 * The latest [Mapnik](http://mapnik.org/) code (at the time of image creation)
-* The latest [Mod_Tile](http://wiki.openstreetmap.org/wiki/Mod_tile) code (at
-  the time of image creation)
 
 ## Issues
 
 This is a work in progress and although generally adequate it could benefit
 from improvements.  Please
-[submit issues](https://github.com/geo-data/openstreetmap-tiles-docker/issues)
+[submit issues](https://github.com/xingfuryda/openstreetmap-import-docker/issues)
 on GitHub. Pull requests are very welcome!

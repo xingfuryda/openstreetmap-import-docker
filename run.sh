@@ -1,11 +1,11 @@
 #!/bin/sh
 
 ##
-# Run OpenStreetMap tile server operations
+# Run OpenStreetMap import server operations
 #
 
-# Command prefix that runs the command as the web user
-asweb="setuser www-data"
+# Command prefix that runs the command as the osmdata user
+asosmdata="setuser osmdata"
 
 die () {
     msg=$1
@@ -39,7 +39,7 @@ initdb () {
 }
 
 createuser () {
-    USER=www-data
+    USER=osmdata
     echo "Creating user $USER"
     setuser postgres createuser -s $USER
 }
@@ -50,18 +50,18 @@ createdb () {
     cd /var/www
 
     # Create the database
-    setuser postgres createdb -O www-data $dbname
+    setuser postgres createdb -O osmdata $dbname
 
     # Install the Postgis schema
-    $asweb psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
+    $asosmdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
 
-    $asweb psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
+    $asosmdata psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
 
     # Set the correct table ownership
-    $asweb psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "www-data"; ALTER TABLE spatial_ref_sys OWNER TO "www-data";'
+    $asosmdata psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "osmdata"; ALTER TABLE spatial_ref_sys OWNER TO "osmdata";'
 
     # Add all spatial reference systems
-    $asweb psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
+    $asosmdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
 }
 
 import () {
@@ -82,7 +82,7 @@ import () {
         number_processes=8
     fi
 
-    $asweb osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
+    $asosmdata osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
 }
 
 dropdb () {
@@ -101,11 +101,6 @@ cli () {
     echo "Running bash"
     cd /var/www
     exec bash
-}
-
-startservices () {
-    _startservice renderd
-    _startservice apache2
 }
 
 help () {

@@ -3,11 +3,10 @@
 ##
 # The OpenStreetMap Tile Server
 #
-# This creates an image with containing the OpenStreetMap tile server stack as
-# described at
+# This creates an image with osm2pgsql as described at
 # <http://switch2osm.org/serving-tiles/manually-building-a-tile-server-12-04/>.
 #
-# forked from homme/openstreetmap-tiles
+# forked from geo-data/openstreetmap-tiles-docker
 
 FROM phusion/baseimage:0.9.17
 MAINTAINER xingfuryda
@@ -54,44 +53,8 @@ RUN cd /tmp/mapnik && \
 # Verify that Mapnik has been installed correctly
 RUN python -c 'import mapnik'
 
-# Install mod_tile and renderd
-RUN cd /tmp && git clone git://github.com/openstreetmap/mod_tile.git
-RUN cd /tmp/mod_tile && \
-    ./autogen.sh && \
-    ./configure && \
-    make && \
-    make install && \
-    make install-mod_tile && \
-    ldconfig
-
-# Install the Mapnik stylesheet
-RUN cd /usr/local/src && svn co http://svn.openstreetmap.org/applications/rendering/mapnik mapnik-style
-
-# Install the coastline data
-RUN cd /usr/local/src/mapnik-style && ./get-coastlines.sh /usr/local/share
-
-# Configure mapnik style-sheets
-RUN cd /usr/local/src/mapnik-style/inc && cp fontset-settings.xml.inc.template fontset-settings.xml.inc
-ADD datasource-settings.sed /tmp/
-RUN cd /usr/local/src/mapnik-style/inc && sed --file /tmp/datasource-settings.sed  datasource-settings.xml.inc.template > datasource-settings.xml.inc
-ADD settings.sed /tmp/
-RUN cd /usr/local/src/mapnik-style/inc && sed --file /tmp/settings.sed  settings.xml.inc.template > settings.xml.inc
-
-# Configure renderd
-ADD renderd.conf.sed /tmp/
-RUN cd /usr/local/etc && sed --file /tmp/renderd.conf.sed --in-place renderd.conf
-
-# Create the files required for the mod_tile system to run
-RUN mkdir /var/run/renderd && chown www-data: /var/run/renderd
-RUN mkdir /var/lib/mod_tile && chown www-data /var/lib/mod_tile
-
-# Configure mod_tile
-ADD mod_tile.load /etc/apache2/mods-available/
-ADD mod_tile.conf /etc/apache2/mods-available/
-RUN a2enmod mod_tile
-
-# Ensure the webserver user can connect to the gis database
-RUN sed -i -e 's/local   all             all                                     peer/local gis www-data peer/' /etc/postgresql/9.4/main/pg_hba.conf
+# Ensure the osmdata user can connect to the gis database
+RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
 
 # Tune postgresql
 ADD postgresql.conf.sed /tmp/
@@ -105,19 +68,11 @@ RUN rm -rf /var/log/postgresql
 ADD postgresql /etc/sv/postgresql
 RUN update-service --add /etc/sv/postgresql
 
-# Create an `apache2` `runit` service
-ADD apache2 /etc/sv/apache2
-RUN update-service --add /etc/sv/apache2
-
-# Create a `renderd` `runit` service
-ADD renderd /etc/sv/renderd
-RUN update-service --add /etc/sv/renderd
-
 # Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Expose the webserver and database ports
-EXPOSE 80 5432
+EXPOSE 5432
 
 # We need the volume for importing data from
 VOLUME ["/data"]
