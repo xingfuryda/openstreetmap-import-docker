@@ -36,10 +36,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.4-postgis pos
 
 # Install osm2pgsql
 RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
-RUN cd /tmp/osm2pgsql && \
-    ./autogen.sh && \
-    ./configure && \
-    make && make install
+RUN cd /tmp/osm2pgsql && mkdir build && cd build
+RUN cmake ..
+RUN cd /tmp/osm2pgsql && make && make install
 
 ## Install the Mapnik library
 RUN cd /tmp && git clone git://github.com/mapnik/mapnik
