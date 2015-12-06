@@ -19,38 +19,33 @@ RUN update-locale LANG=C.UTF-8
 # Ensure `add-apt-repository` is present
 RUN apt-get update -y
 RUN apt-get install -y software-properties-common python-software-properties
-
-RUN apt-get install -y make cmake g++ libboost-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev
-
-# Install remaining dependencies
-RUN apt-get install -y subversion git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libpq-dev libbz2-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libprotobuf-dev protobuf-compiler pkg-config libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont
-
-RUN apt-get install -y autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libgdal1-dev mapnik-utils python-mapnik libmapnik-dev
+RUN add-apt-repository -y ppa:boost-latest/ppa
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 # Install postgresql and postgis
+RUN apt-get install -y wget
 RUN locale-gen en_US.UTF-8
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' | tee /etc/apt/sources.list.d/pgdg.list
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-RUN apt-get update
+RUN apt-get update -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-9.4-postgis postgresql-contrib postgresql-server-dev-9.4
+
+# install compiler
+RUN apt-get install -y gcc-4.8 g++-4.8
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
+RUN update-alternatives --config gcc
+RUN update-alternatives --config g++
+
+RUN apt-get install -y build-essential make cmake libboost1.55-dev libboost-filesystem1.55-dev libboost-program-options1.55-dev libboost-python1.55-dev libboost-regex1.55-dev libboost-system1.55-dev libboost-thread1.55-dev
+
+# Install osm2pgsql dependencies
+RUN apt-get install -y subversion git git-core tar unzip libbz2-dev bzip2 libtool libxml2-dev libgeos-dev libpq-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libprotobuf-dev protobuf-compiler pkg-config libfreetype6-dev libpng12-dev libtiff4-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev libagg-dev liblua5.2-dev ttf-unifont libgeos++-dev libproj-dev gdal-bin libgdal1-dev
 
 # Install osm2pgsql
 RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
 RUN cd /tmp/osm2pgsql && mkdir build && cd build
-RUN cmake ..
-RUN cd /tmp/osm2pgsql && make && make install
-
-## Install the Mapnik library
-RUN cd /tmp && git clone git://github.com/mapnik/mapnik
-RUN cd /tmp/mapnik && \
-    git checkout 2.2.x && \
-    python scons/scons.py configure INPUT_PLUGINS=all OPTIMIZATION=3 SYSTEM_FONTS=/usr/share/fonts/truetype/ && \
-    python scons/scons.py && \
-    python scons/scons.py install && \
-    ldconfig
-
-# Verify that Mapnik has been installed correctly
-RUN python -c 'import mapnik'
+RUN cmake .. && make && make install
 
 # Ensure the osmdata user can connect to the gis database
 RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
