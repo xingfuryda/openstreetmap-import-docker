@@ -19,8 +19,6 @@ RUN update-locale LANG=C.UTF-8
 # Ensure `add-apt-repository` is present
 RUN apt-get update -y
 RUN apt-get install -y software-properties-common python-software-properties
-# RUN add-apt-repository -y ppa:boost-latest/ppa
-# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 # Install postgresql and postgis
 RUN apt-get install -y wget
@@ -44,12 +42,8 @@ RUN apt-get install -y subversion git git-core tar unzip libbz2-dev bzip2 libtoo
 
 # Install osm2pgsql
 RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
-RUN cd /tmp/osm2pgsql
-RUN mkdir build
-RUN cd build
-RUN cmake ../
-RUN make
-RUN make install
+RUN cd /tmp/osm2pgsql && mkdir build && cd build && cmake ..
+RUN cd /tmp/osm2pgsql/build && make && make install
 
 # Ensure the osmdata user can connect to the gis database
 RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
