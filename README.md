@@ -24,10 +24,8 @@ The container runs Ubuntu 14.04 (Trusty) and is based on the
 includes:
 
 * Postgresql 9.4
-* Apache 2.2
 * The latest [Osm2pgsql](http://wiki.openstreetmap.org/wiki/Osm2pgsql) code (at
-  the time of image creation)
-* The latest [Mapnik](http://mapnik.org/) code (at the time of image creation)
+  the time of image creation 0.89 December 2015)
 
 ## Issues
 

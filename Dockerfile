@@ -1,12 +1,12 @@
 ## -*- docker-image-name: "xingfuryda/openstreetmap-tiles-docker:latest" -*-
 
 ##
-# The OpenStreetMap Tile Server
+# The OpenStreetMap Import Server
 #
 # This creates an image with osm2pgsql as described at
 # <http://switch2osm.org/serving-tiles/manually-building-a-tile-server-12-04/>.
 #
-# forked from geo-data/openstreetmap-tiles-docker
+# forked and adapted from geo-data/openstreetmap-tiles-docker
 
 FROM phusion/baseimage:0.9.17
 MAINTAINER xingfuryda
@@ -45,7 +45,7 @@ RUN apt-get install -y subversion git git-core tar unzip libbz2-dev bzip2 libtoo
 # Install osm2pgsql
 RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
 RUN cd /tmp/osm2pgsql && mkdir build && cd build
-RUN cmake .. && make && make install
+RUN cmake /tmp/osm2pgsql && make && make install
 
 # Ensure the osmdata user can connect to the gis database
 RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
