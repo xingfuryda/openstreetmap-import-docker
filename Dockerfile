@@ -44,8 +44,12 @@ RUN apt-get install -y subversion git git-core tar unzip libbz2-dev bzip2 libtoo
 
 # Install osm2pgsql
 RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
-RUN cd /tmp/osm2pgsql && mkdir build && cd build
-RUN cmake /tmp/osm2pgsql && make && make install
+RUN cd /tmp/osm2pgsql
+RUN mkdir build
+RUN cd build
+RUN cmake ../
+RUN make
+RUN make install
 
 # Ensure the osmdata user can connect to the gis database
 RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
