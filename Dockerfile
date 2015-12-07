@@ -19,11 +19,11 @@ RUN update-locale LANG=C.UTF-8
 # Ensure `add-apt-repository` is present
 RUN apt-get update -y
 RUN apt-get install -y software-properties-common python-software-properties
-RUN add-apt-repository -y ppa:boost-latest/ppa
-RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
+# RUN add-apt-repository -y ppa:boost-latest/ppa
+# RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 # Install postgresql and postgis
-RUN apt-get install -y wget
+# RUN apt-get install -y wget
 RUN locale-gen en_US.UTF-8
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
