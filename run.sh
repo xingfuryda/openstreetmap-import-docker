@@ -4,8 +4,8 @@
 # Run OpenStreetMap import server operations
 #
 
-# Command prefix that runs the command as the osmdata user
-asosmdata="setuser osmdata"
+# Command prefix that runs the command as the www-data user
+aswww-data="setuser www-data"
 
 die () {
     msg=$1
@@ -39,7 +39,7 @@ initdb () {
 }
 
 createuser () {
-    USER=osmdata
+    USER=www-data
     echo "Creating user $USER"
     setuser postgres createuser -s $USER
 }
@@ -50,18 +50,18 @@ createdb () {
     cd /var/www
 
     # Create the database
-    setuser postgres createdb -O osmdata $dbname
+    setuser postgres createdb -O www-data $dbname
 
     # Install the Postgis schema
-    $asosmdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
+    $aswww-data psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
 
-    $asosmdata psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
+    $aswww-data psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
 
     # Set the correct table ownership
-    $asosmdata psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "osmdata"; ALTER TABLE spatial_ref_sys OWNER TO "osmdata";'
+    $aswww-data psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "www-data"; ALTER TABLE spatial_ref_sys OWNER TO "www-data";'
 
     # Add all spatial reference systems
-    $asosmdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
+    $aswww-data psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
 }
 
 import () {
@@ -82,7 +82,7 @@ import () {
         number_processes=8
     fi
 
-    $asosmdata osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
+    $aswww-data osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
 }
 
 dropdb () {
