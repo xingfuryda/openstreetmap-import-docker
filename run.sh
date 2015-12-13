@@ -47,7 +47,6 @@ createuser () {
 createdb () {
     dbname=gis
     echo "Creating database $dbname"
-    cd /var/www
 
     # Create the database
     setuser postgres createdb -O www-data $dbname
@@ -87,19 +86,16 @@ import () {
 
 dropdb () {
     echo "Dropping database"
-    cd /var/www
     setuser postgres dropdb gis
 }
 
 dumpdb () {
     echo "Dumping database"
-    cd /var/www
     setuser postgres pg_dump gis | gzip > /data/gis_pgdump.gz
 }
 
 cli () {
     echo "Running bash"
-    cd /var/www
     exec bash
 }
 
