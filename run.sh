@@ -5,7 +5,7 @@
 #
 
 # Command prefix that runs the command as the www-data user
-aswww-data="setuser www-data"
+aswwwdata="setuser www-data"
 
 die () {
     msg=$1
@@ -52,15 +52,15 @@ createdb () {
     setuser postgres createdb -O www-data $dbname
 
     # Install the Postgis schema
-    $aswww-data psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
+    $aswwwdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
 
-    $aswww-data psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
+    $aswwwdata psql -d $dbname -c 'CREATE EXTENSION HSTORE;'
 
     # Set the correct table ownership
-    $aswww-data psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "www-data"; ALTER TABLE spatial_ref_sys OWNER TO "www-data";'
+    $aswwwdata psql -d $dbname -c 'ALTER TABLE geometry_columns OWNER TO "www-data"; ALTER TABLE spatial_ref_sys OWNER TO "www-data";'
 
     # Add all spatial reference systems
-    $aswww-data psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
+    $aswwwdata psql -d $dbname -f /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
 }
 
 import () {
@@ -81,7 +81,7 @@ import () {
         number_processes=8
     fi
 
-    $aswww-data osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
+    $aswwwdata osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
 }
 
 dropdb () {
