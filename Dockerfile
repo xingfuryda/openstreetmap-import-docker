@@ -58,6 +58,7 @@ RUN rm -rf /var/log/postgresql
 
 # Create a `postgresql` `runit` service
 ADD postgresql /etc/sv/postgresql
+RUN chmod +x /etc/sv/postgresql/run
 RUN update-service --add /etc/sv/postgresql
 
 # Clean up APT when done
