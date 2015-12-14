@@ -45,8 +45,9 @@ RUN cd /tmp && git clone git://github.com/openstreetmap/osm2pgsql.git
 RUN cd /tmp/osm2pgsql && mkdir build && cd build && cmake ..
 RUN cd /tmp/osm2pgsql/build && make && make install
 
-# Ensure the osmdata user can connect to the gis database
-RUN sed -i -e 's/local   all             all                                     peer/local gis osmdata peer/' /etc/postgresql/9.4/main/pg_hba.conf
+# Ensure the www-data user can connect to the gis database
+RUN sed -i -e 's/local   all             all                                     peer/local gis www-data peer/' /etc/postgresql/9.4/main/pg_hba.conf
+RUN echo "host    all         all         *         trust" >> /etc/postgresql/9.4/main/pg_hba.conf
 
 # Tune postgresql
 ADD postgresql.conf.sed /tmp/

@@ -81,7 +81,7 @@ import () {
         number_processes=8
     fi
 
-    $aswwwdata osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes $import
+    $aswwwdata osm2pgsql --slim --hstore --cache $OSM_IMPORT_CACHE --database gis --number-processes $number_processes --style /usr/local/share/osm2pgsql/default.style $import
 }
 
 dropdb () {
