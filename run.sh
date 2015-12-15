@@ -25,7 +25,7 @@ initdb () {
     echo "Initialising postgresql"
     if [ -d /var/lib/postgresql/9.4/main ] && [ $( ls -A /var/lib/postgresql/9.4/main | wc -c ) -ge 0 ]
     then
-        die "Initialisation failed: the directory is not empty: /var/lib/postgresql/9.4/main"
+        rm -rf /var/lib/postgresql/9.4/main
     fi
 
     mkdir -p /var/lib/postgresql/9.4/main && chown -R postgres /var/lib/postgresql/
@@ -92,6 +92,11 @@ dropdb () {
 dumpdb () {
     echo "Dumping database"
     setuser postgres pg_dump gis | gzip > /data/gis_pgdump.gz
+}
+
+restoredb () {
+    echo "Restoring database"
+	setuser postgres gunzip -c /data/gis_pgdump.gz | psql gis    
 }
 
 cli () {
